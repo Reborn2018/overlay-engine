@@ -41,7 +41,7 @@ function neonBreathe(imageUrl, opts = {}) {
   return `${baseHead()}
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
-.g{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;pointer-events:none}
+.g{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;pointer-events:none}
 .g1{animation:b1 ${dur1}s ease-in-out infinite;filter:blur(${p.glowSize}px) brightness(1.5) saturate(1.8)}
 .g2{animation:b2 ${dur2}s ease-in-out infinite;filter:blur(${p.glowSize * 2.75}px) brightness(2) saturate(2.2)}
 @keyframes b1{0%,100%{opacity:${op1}}50%{opacity:${op1b}}}
@@ -67,7 +67,7 @@ function particleStorm(imageUrl, opts = {}) {
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;animation:pulse 4s ease-in-out infinite;filter:blur(6px) brightness(1.4) saturate(1.6);opacity:${glowOp};z-index:2;pointer-events:none}
+.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;animation:pulse 4s ease-in-out infinite;filter:blur(6px) brightness(1.4) saturate(1.6);opacity:${glowOp};z-index:2;pointer-events:none}
 @keyframes pulse{0%,100%{opacity:${pulseOp1}}50%{opacity:${pulseOp2}}}
 </style>
 <div class="glow"></div>
@@ -115,7 +115,7 @@ function cyberGlitch(imageUrl, opts = {}) {
 @keyframes scanroll{0%{background-position:0 0}100%{background-position:0 1080px}}
 .rgb{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen}
 .bar{position:absolute;left:0;width:1920px;height:0;background:rgba(180,77,255,0.15);z-index:5;pointer-events:none;opacity:0}
-.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;filter:blur(6px) brightness(1.3) saturate(1.5);opacity:${glowOp};z-index:0;animation:gp 3s ease-in-out infinite;pointer-events:none}
+.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;filter:blur(6px) brightness(1.3) saturate(1.5);opacity:${glowOp};z-index:0;animation:gp 3s ease-in-out infinite;pointer-events:none}
 @keyframes gp{0%,100%{opacity:${glowOp}}50%{opacity:${glowOp2}}}
 </style>
 <div class="glow"></div>
@@ -156,7 +156,7 @@ function colorWave(imageUrl, opts = {}) {
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1;animation:hue ${cycleDur}s linear infinite}
 @keyframes hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
-.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;z-index:2;pointer-events:none;animation:gw ${cycleDur}s linear infinite,breathe 3s ease-in-out infinite;filter:blur(10px) brightness(1.8) saturate(2);opacity:${glowOp}}
+.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;z-index:2;pointer-events:none;animation:gw ${cycleDur}s linear infinite,breathe 3s ease-in-out infinite;filter:blur(10px) brightness(1.8) saturate(2);opacity:${glowOp}}
 @keyframes gw{0%{filter:blur(10px) brightness(1.8) saturate(2) hue-rotate(0deg)}100%{filter:blur(10px) brightness(1.8) saturate(2) hue-rotate(360deg)}}
 @keyframes breathe{0%,100%{opacity:${glowOp}}50%{opacity:${glowOp2}}}
 .sweep{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:3;pointer-events:none;background:linear-gradient(90deg,transparent 0%,rgba(180,77,255,0.08) 25%,rgba(0,200,255,0.08) 50%,rgba(180,77,255,0.08) 75%,transparent 100%);background-size:200% 100%;animation:sw ${sweepDur}s ease-in-out infinite}
@@ -199,9 +199,9 @@ function flyingSheep(imageUrl, opts = {}) {
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(8px) brightness(1.3);z-index:2;pointer-events:none;animation:wg 6s ease-in-out infinite}
+.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(8px) brightness(1.3);z-index:2;pointer-events:none;animation:wg 6s ease-in-out infinite}
 @keyframes wg{0%,100%{opacity:${glowOp}}50%{opacity:${(p.warmGlow*1.5).toFixed(2)}}}
-.cloud{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${cloudOp};filter:blur(20px) brightness(1.1);z-index:1;pointer-events:none}
+.cloud{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${cloudOp};filter:blur(20px) brightness(1.1);z-index:1;pointer-events:none}
 </style>
 <div class="warm"></div>
 <div class="cloud"></div>
@@ -322,7 +322,7 @@ function kawaiiSparkles(imageUrl, opts = {}) {
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:0.15;filter:blur(12px) brightness(1.2);z-index:2;pointer-events:none}
+.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:0.15;filter:blur(12px) brightness(1.2);z-index:2;pointer-events:none}
 </style>
 <div class="soft"></div>
 <img class="base" src="${imageUrl}" crossorigin="anonymous">
@@ -417,7 +417,7 @@ function fireflyNight(imageUrl, opts = {}) {
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(15px) brightness(1.1);z-index:2;pointer-events:none;animation:ww 5s ease-in-out infinite}
+.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(15px) brightness(1.1);z-index:2;pointer-events:none;animation:ww 5s ease-in-out infinite}
 @keyframes ww{0%,100%{opacity:${glowOp}}50%{opacity:${(p.glowIntensity*1.4).toFixed(2)}}}
 </style>
 <div class="warm"></div>
@@ -490,7 +490,7 @@ function bunnyParade(imageUrl, opts = {}) {
 <style>
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(15px) brightness(1.2);z-index:2;pointer-events:none}
+.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(15px) brightness(1.2);z-index:2;pointer-events:none}
 </style>
 <div class="soft"></div>
 <img class="base" src="${imageUrl}" crossorigin="anonymous">
