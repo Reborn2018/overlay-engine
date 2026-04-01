@@ -47,7 +47,7 @@ function neonBreathe(imageUrl, opts = {}) {
 @keyframes b1{0%,100%{opacity:${op1}}50%{opacity:${op1b}}}
 @keyframes b2{0%,100%{opacity:${op2}}50%{opacity:${op2b}}}
 </style>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <div class="g g1"></div>
 <div class="g g2"></div>
 ${watermarkHtml(opts.watermark)}
@@ -71,7 +71,7 @@ canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
 @keyframes pulse{0%,100%{opacity:${pulseOp1}}50%{opacity:${pulseOp2}}}
 </style>
 <div class="glow"></div>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
@@ -119,7 +119,7 @@ function cyberGlitch(imageUrl, opts = {}) {
 @keyframes gp{0%,100%{opacity:${glowOp}}50%{opacity:${glowOp2}}}
 </style>
 <div class="glow"></div>
-<img class="base" id="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" id="base" src="${imageUrl}">
 <div class="rgb" id="rgbR"></div>
 <div class="rgb" id="rgbB"></div>
 <div class="scan"></div>
@@ -163,7 +163,7 @@ function colorWave(imageUrl, opts = {}) {
 @keyframes sw{0%{background-position:200% 0}100%{background-position:-200% 0}}
 canvas{position:absolute;top:0;left:0;z-index:4;pointer-events:none}
 </style>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <div class="glow"></div>
 <div class="sweep"></div>
 <canvas id="cv" width="1920" height="1080"></canvas>
@@ -205,7 +205,7 @@ canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
 </style>
 <div class="warm"></div>
 <div class="cloud"></div>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
@@ -325,7 +325,7 @@ canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
 .soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:0.15;filter:blur(12px) brightness(1.2);z-index:2;pointer-events:none}
 </style>
 <div class="soft"></div>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
@@ -421,7 +421,7 @@ canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
 @keyframes ww{0%,100%{opacity:${glowOp}}50%{opacity:${(p.glowIntensity*1.4).toFixed(2)}}}
 </style>
 <div class="warm"></div>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
@@ -493,7 +493,7 @@ canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
 .soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(15px) brightness(1.2);z-index:2;pointer-events:none}
 </style>
 <div class="soft"></div>
-<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<img class="base" src="${imageUrl}">
 <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
