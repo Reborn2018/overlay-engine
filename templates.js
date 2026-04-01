@@ -34,24 +34,39 @@ function neonBreathe(imageUrl, opts = {}) {
   const p = { speed: 1.0, intensity: 1.0, color: '#b44dff', glowSize: 8, ...opts };
   const dur1 = (3 / p.speed).toFixed(1);
   const dur2 = (4.5 / p.speed).toFixed(1);
-  const op1 = Math.min(0.35 * p.intensity, 0.9).toFixed(2);
-  const op2 = Math.min(0.15 * p.intensity, 0.6).toFixed(2);
-  const op1b = Math.min(0.75 * p.intensity, 1.0).toFixed(2);
-  const op2b = Math.min(0.45 * p.intensity, 1.0).toFixed(2);
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
-.g{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;pointer-events:none}
-.g1{animation:b1 ${dur1}s ease-in-out infinite;filter:blur(${p.glowSize}px) brightness(1.5) saturate(1.8)}
-.g2{animation:b2 ${dur2}s ease-in-out infinite;filter:blur(${p.glowSize * 2.75}px) brightness(2) saturate(2.2)}
-@keyframes b1{0%,100%{opacity:${op1}}50%{opacity:${op1b}}}
-@keyframes b2{0%,100%{opacity:${op2}}50%{opacity:${op2b}}}
-</style>
-<img class="base" src="${imageUrl}">
-<div class="g g1"></div>
-<div class="g g2"></div>
+  const op1 = Math.min(0.5 * p.intensity, 1.0).toFixed(2);
+  const op1b = Math.min(1.0 * p.intensity, 1.0).toFixed(2);
+  const op2 = Math.min(0.25 * p.intensity, 0.9).toFixed(2);
+  const op2b = Math.min(0.7 * p.intensity, 1.0).toFixed(2);
+  // 背景发光：独立于底图颜色，纯色光晕
+  const bgOp1 = (0.2 * p.intensity).toFixed(2);
+  const bgOp1b = (0.55 * p.intensity).toFixed(2);
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px;overflow:hidden}
+/* 背景：独立纯色光晕，不依赖底图 */
+.bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse 120% 80% at 50% 50%, rgba(120,40,220,0.6) 0%, rgba(80,20,180,0.2) 40%, transparent 70%);z-index:0;animation:bg1 ${dur1}s ease-in-out infinite}
+.bg2{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse 80% 120% at 30% 70%, rgba(200,80,255,0.3) 0%, transparent 60%);z-index:0;animation:bg2 ${dur2}s ease-in-out infinite}
+@keyframes bg1{0%,100%{opacity:${bgOp1}}50%{opacity:${bgOp1b}}}
+@keyframes bg2{0%,100%{opacity:${(0.15*p.intensity).toFixed(2)}}50%{opacity:${(0.35*p.intensity).toFixed(2)}}}
+/* 底图 */
+.base{position:absolute;top:0;left:0;width:1920px;height:1080px;object-fit:contain;z-index:1;pointer-events:none}
+/* 叠加发光层 */
+.layer1{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;z-index:2;pointer-events:none;mix-blend-mode:screen;filter:blur(4px) brightness(1.5) saturate(1.6);animation:l1 ${dur1}s ease-in-out infinite}
+.layer2{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;z-index:3;pointer-events:none;mix-blend-mode:screen;filter:blur(14px) brightness(2) saturate(2);animation:l2 ${dur2}s ease-in-out infinite}
+@keyframes l1{0%,100%{opacity:${op1}}50%{opacity:${op1b}}}
+@keyframes l2{0%,100%{opacity:${op2}}50%{opacity:${op2b}}}
+</style></head><body>
+<div class="wrap">
+  <div class="bg"></div>
+  <div class="bg2"></div>
+  <img class="layer2" src="${imageUrl}">
+  <img class="layer1" src="${imageUrl}">
+  <img class="base" src="${imageUrl}">
+</div>
 ${watermarkHtml(opts.watermark)}
-${baseTail()}`;
+</body></html>`;
 }
 
 // ==================== 2. 粒子风暴 ====================
@@ -63,16 +78,25 @@ function particleStorm(imageUrl, opts = {}) {
   const glowOp = Math.min(p.glowIntensity, 1).toFixed(2);
   const pulseOp1 = (p.glowIntensity * 0.7).toFixed(2);
   const pulseOp2 = (p.glowIntensity * 1.4).toFixed(2);
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立背景光晕，不依赖底图 */
+.glow-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 80%, rgba(120,40,220,0.5) 0%, rgba(80,20,180,0.2) 40%, transparent 70%);z-index:0;animation:pg 4s ease-in-out infinite}
+.glow-bg2{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse 100% 60% at 30% 60%, rgba(200,80,255,0.25) 0%, transparent 60%);z-index:0;animation:pg2 6s ease-in-out infinite}
+@keyframes pg{0%,100%{opacity:${pulseOp1}}50%{opacity:${pulseOp2}}}
+@keyframes pg2{0%,100%{opacity:${(p.glowIntensity*0.4).toFixed(2)}}50%{opacity:${(p.glowIntensity*0.8).toFixed(2)}}}
+/* 叠加发光层 */
+.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;animation:pg 4s ease-in-out infinite;filter:blur(8px) brightness(1.6) saturate(1.8);opacity:${glowOp};z-index:1;pointer-events:none}
+.base{position:absolute;top:0;left:0;width:1920px;height:1080px;object-fit:contain;z-index:2;pointer-events:none}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;animation:pulse 4s ease-in-out infinite;filter:blur(6px) brightness(1.4) saturate(1.6);opacity:${glowOp};z-index:2;pointer-events:none}
-@keyframes pulse{0%,100%{opacity:${pulseOp1}}50%{opacity:${pulseOp2}}}
-</style>
-<div class="glow"></div>
-<img class="base" src="${imageUrl}">
-<canvas id="cv" width="1920" height="1080"></canvas>
+</style></head><body>
+<div class="wrap">
+  <div class="glow-bg"></div>
+  <div class="glow-bg2"></div>
+  <div class="glow"></div>
+  <img class="base" src="${imageUrl}">
+  <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -96,7 +120,8 @@ function animate(){
 }
 animate();
 </script>
-${baseTail()}`;
+${watermarkHtml(opts.watermark)}
+</div></body></html>`;
 }
 
 // ==================== 3. 赛博故障 ====================
@@ -108,22 +133,25 @@ function cyberGlitch(imageUrl, opts = {}) {
   const freq = Math.max(800 / p.glitchFrequency, 200);
   const freq2 = Math.max(3000 / p.glitchFrequency, 500);
   const offset = p.rgbOffset;
-  return `${baseHead()}
-<style>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立背景发光 */
+.glow-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 50%, rgba(0,180,255,0.15) 0%, rgba(0,100,200,0.05) 40%, transparent 70%);z-index:0;animation:gp 3s ease-in-out infinite}
+@keyframes gp{0%,100%{opacity:${glowOp}}50%{opacity:${glowOp2}}}
 .base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
 .scan{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:4;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,${scanOp}) 2px,rgba(0,0,0,${scanOp}) 4px);animation:scanroll 8s linear infinite}
 @keyframes scanroll{0%{background-position:0 0}100%{background-position:0 1080px}}
 .rgb{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen}
-.bar{position:absolute;left:0;width:1920px;height:0;background:rgba(180,77,255,0.15);z-index:5;pointer-events:none;opacity:0}
-.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;filter:blur(6px) brightness(1.3) saturate(1.5);opacity:${glowOp};z-index:0;animation:gp 3s ease-in-out infinite;pointer-events:none}
-@keyframes gp{0%,100%{opacity:${glowOp}}50%{opacity:${glowOp2}}}
-</style>
-<div class="glow"></div>
-<img class="base" id="base" src="${imageUrl}">
-<div class="rgb" id="rgbR"></div>
-<div class="rgb" id="rgbB"></div>
-<div class="scan"></div>
-<div class="bar" id="b1"></div><div class="bar" id="b2"></div>
+.bar{position:absolute;left:0;width:1920px;height:0;background:rgba(0,200,255,0.12);z-index:5;pointer-events:none;opacity:0}
+</style></head><body>
+<div class="wrap">
+  <div class="glow-bg"></div>
+  <img class="base" id="base" src="${imageUrl}">
+  <div class="rgb" id="rgbR"></div>
+  <div class="rgb" id="rgbB"></div>
+  <div class="scan"></div>
+  <div class="bar" id="b1"></div><div class="bar" id="b2"></div>
 ${watermarkHtml(opts.watermark)}
 <script>
 const rgbR=document.getElementById('rgbR'),rgbB=document.getElementById('rgbB');
@@ -141,7 +169,8 @@ function glitch(){
 function micro(){if(Math.random()<0.3){base.style.transform='translateX('+(Math.random()-0.5)*2+'px)';setTimeout(()=>{base.style.transform=''},50)}setTimeout(micro,200+Math.random()*500)}
 glitch();micro();
 </script>
-${baseTail()}`;
+${watermarkHtml(opts.watermark)}
+</div></body></html>`;
 }
 
 // ==================== 4. 色彩波浪 ====================
@@ -152,21 +181,29 @@ function colorWave(imageUrl, opts = {}) {
   const bokehCount = Math.round(p.bokehCount);
   const glowOp = Math.min(p.glowIntensity, 1).toFixed(2);
   const glowOp2 = (p.glowIntensity * 1.5).toFixed(2);
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1;animation:hue ${cycleDur}s linear infinite}
-@keyframes hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
-.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;z-index:2;pointer-events:none;animation:gw ${cycleDur}s linear infinite,breathe 3s ease-in-out infinite;filter:blur(10px) brightness(1.8) saturate(2);opacity:${glowOp}}
-@keyframes gw{0%{filter:blur(10px) brightness(1.8) saturate(2) hue-rotate(0deg)}100%{filter:blur(10px) brightness(1.8) saturate(2) hue-rotate(360deg)}}
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立背景光晕，不依赖底图 */
+.glow-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 50%, rgba(100,60,200,0.45) 0%, rgba(60,20,140,0.15) 40%, transparent 70%);z-index:0;animation:cw ${cycleDur}s linear infinite,breathe 3s ease-in-out infinite}
+@keyframes cw{0%{background:radial-gradient(ellipse at 50% 50%, rgba(100,0,200,0.45) 0%, rgba(40,0,120,0.15) 40%, transparent 70%)}50%{background:radial-gradient(ellipse at 50% 50%, rgba(200,40,100,0.45) 0%, rgba(120,20,60,0.15) 40%, transparent 70%)}100%{background:radial-gradient(ellipse at 50% 50%, rgba(0,160,200,0.45) 0%, rgba(0,80,140,0.15) 40%, transparent 70%)}}
 @keyframes breathe{0%,100%{opacity:${glowOp}}50%{opacity:${glowOp2}}}
-.sweep{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:3;pointer-events:none;background:linear-gradient(90deg,transparent 0%,rgba(180,77,255,0.08) 25%,rgba(0,200,255,0.08) 50%,rgba(180,77,255,0.08) 75%,transparent 100%);background-size:200% 100%;animation:sw ${sweepDur}s ease-in-out infinite}
+/* 底图带色相旋转 */
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1;animation:hue ${cycleDur}s linear infinite;pointer-events:none}
+@keyframes hue{0%{filter:hue-rotate(0deg) brightness(1.05)}100%{filter:hue-rotate(360deg) brightness(1.05)}}
+/* 叠加发光层 */
+.glow{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;z-index:2;pointer-events:none;animation:hue ${cycleDur}s linear infinite;filter:blur(10px) brightness(1.8) saturate(1.6)}
+/* 光束扫过 */
+.sweep{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:3;pointer-events:none;background:linear-gradient(90deg,transparent 0%,rgba(180,77,255,0.1) 25%,rgba(0,200,255,0.1) 50%,rgba(180,77,255,0.1) 75%,transparent 100%);background-size:200% 100%;animation:sw ${sweepDur}s ease-in-out infinite}
 @keyframes sw{0%{background-position:200% 0}100%{background-position:-200% 0}}
 canvas{position:absolute;top:0;left:0;z-index:4;pointer-events:none}
-</style>
-<img class="base" src="${imageUrl}">
-<div class="glow"></div>
-<div class="sweep"></div>
-<canvas id="cv" width="1920" height="1080"></canvas>
+</style></head><body>
+<div class="wrap">
+  <div class="glow-bg"></div>
+  <div class="glow"></div>
+  <img class="base" src="${imageUrl}">
+  <div class="sweep"></div>
+  <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -182,7 +219,7 @@ function animate(){
 }
 animate();
 </script>
-${baseTail()}`;
+</div></body></html>`;
 }
 
 // ==================== 5. 飞绵羊 ====================
@@ -195,18 +232,24 @@ function flyingSheep(imageUrl, opts = {}) {
   const colorsJson = JSON.stringify(p.colors);
   const cloudOp = Math.min(p.cloudOpacity, 0.4).toFixed(2);
   const glowOp = Math.min(p.warmGlow, 0.6).toFixed(2);
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
-canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(8px) brightness(1.3);z-index:2;pointer-events:none;animation:wg 6s ease-in-out infinite}
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立背景暖色光晕 */
+.warm-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 80%, rgba(255,180,200,0.4) 0%, rgba(255,140,160,0.15) 40%, transparent 70%);z-index:0;animation:wg 6s ease-in-out infinite}
 @keyframes wg{0%,100%{opacity:${glowOp}}50%{opacity:${(p.warmGlow*1.5).toFixed(2)}}}
-.cloud{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${cloudOp};filter:blur(20px) brightness(1.1);z-index:1;pointer-events:none}
-</style>
-<div class="warm"></div>
-<div class="cloud"></div>
-<img class="base" src="${imageUrl}">
-<canvas id="cv" width="1920" height="1080"></canvas>
+/* 叠加发光层 */
+.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(8px) brightness(1.3);z-index:1;pointer-events:none;animation:wg 6s ease-in-out infinite}
+.cloud{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${cloudOp};filter:blur(20px) brightness(1.1);z-index:1;pointer-events:none}
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:2;pointer-events:none}
+canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
+</style></head><body>
+<div class="wrap">
+  <div class="warm-bg"></div>
+  <div class="warm"></div>
+  <div class="cloud"></div>
+  <img class="base" src="${imageUrl}">
+  <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -307,7 +350,7 @@ function animate(){
 }
 animate();
 </script>
-${baseTail()}`;
+</div></body></html>`;
 }
 
 // ==================== 6. 梦幻星光 ====================
@@ -318,15 +361,22 @@ function kawaiiSparkles(imageUrl, opts = {}) {
   };
   const colorsJson = JSON.stringify(p.colors);
   const op = Math.min(p.sparkleOpacity, 1).toFixed(2);
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立背景光晕 */
+.soft-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 50%, rgba(200,150,255,0.35) 0%, rgba(150,100,200,0.15) 40%, transparent 70%);z-index:0;animation:sb 4s ease-in-out infinite}
+@keyframes sb{0%,100%{opacity:0.7}50%{opacity:1.0}}
+/* 叠加发光层 */
+.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:0.15;filter:blur(12px) brightness(1.2);z-index:1;pointer-events:none}
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:2;pointer-events:none}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:0.15;filter:blur(12px) brightness(1.2);z-index:2;pointer-events:none}
-</style>
-<div class="soft"></div>
-<img class="base" src="${imageUrl}">
-<canvas id="cv" width="1920" height="1080"></canvas>
+</style></head><body>
+<div class="wrap">
+  <div class="soft-bg"></div>
+  <div class="soft"></div>
+  <img class="base" src="${imageUrl}">
+  <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -402,7 +452,7 @@ function animate(){
 }
 animate();
 </script>
-${baseTail()}`;
+</div></body></html>`;
 }
 
 // ==================== 7. 萤火虫之夜 ====================
@@ -413,16 +463,22 @@ function fireflyNight(imageUrl, opts = {}) {
   };
   const colorsJson = JSON.stringify(p.colors);
   const glowOp = Math.min(p.glowIntensity, 1).toFixed(2);
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
-canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(15px) brightness(1.1);z-index:2;pointer-events:none;animation:ww 5s ease-in-out infinite}
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立暖色背景光晕 */
+.warm-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 50%, rgba(100,80,0,0.3) 0%, rgba(60,40,0,0.1) 40%, transparent 70%);z-index:0;animation:ww 5s ease-in-out infinite}
 @keyframes ww{0%,100%{opacity:${glowOp}}50%{opacity:${(p.glowIntensity*1.4).toFixed(2)}}}
-</style>
-<div class="warm"></div>
-<img class="base" src="${imageUrl}">
-<canvas id="cv" width="1920" height="1080"></canvas>
+/* 叠加发光层 */
+.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(15px) brightness(1.1);z-index:1;pointer-events:none;animation:ww 5s ease-in-out infinite}
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:2;pointer-events:none}
+canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
+</style></head><body>
+<div class="wrap">
+  <div class="warm-bg"></div>
+  <div class="warm"></div>
+  <img class="base" src="${imageUrl}">
+  <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -475,7 +531,7 @@ function animate(){
 }
 animate();
 </script>
-${baseTail()}`;
+</div></body></html>`;
 }
 
 // ==================== 8. 兔子游行 ====================
@@ -486,15 +542,22 @@ function bunnyParade(imageUrl, opts = {}) {
   };
   const glowOp = Math.min(p.glowOpacity, 0.6).toFixed(2);
   const bunnyColor = p.color || '#fff0f5';
-  return `${baseHead()}
-<style>
-.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+.wrap{position:relative;width:1920px;height:1080px}
+/* 独立粉色背景光晕 */
+.soft-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 80%, rgba(255,200,220,0.4) 0%, rgba(255,180,200,0.15) 40%, transparent 70%);z-index:0;animation:sb 3s ease-in-out infinite}
+@keyframes sb{0%,100%{opacity:0.6}50%{opacity:1.0}}
+/* 叠加发光层 */
+.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(15px) brightness(1.2);z-index:1;pointer-events:none}
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:2;pointer-events:none}
 canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
-.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:overlay;opacity:${glowOp};filter:blur(15px) brightness(1.2);z-index:2;pointer-events:none}
-</style>
-<div class="soft"></div>
-<img class="base" src="${imageUrl}">
-<canvas id="cv" width="1920" height="1080"></canvas>
+</style></head><body>
+<div class="wrap">
+  <div class="soft-bg"></div>
+  <div class="soft"></div>
+  <img class="base" src="${imageUrl}">
+  <canvas id="cv" width="1920" height="1080"></canvas>
 ${watermarkHtml(opts.watermark)}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -586,7 +649,7 @@ function animate(){
 }
 animate();
 </script>
-${baseTail()}`;
+</div></body></html>`;
 }
 
 // 预设配置（供 server.js 读取）
