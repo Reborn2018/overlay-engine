@@ -1,0 +1,52 @@
+{
+  "presets": [
+    {
+      "id": "neon-breathe",
+      "name": "霓虹呼吸",
+      "description": "发光脉冲，柔和呼吸感",
+      "tags": ["通用", "柔和"],
+      "params": {
+        "speed": 1.0,
+        "intensity": 1.0,
+        "color": "#b44dff",
+        "glowSize": 8
+      }
+    },
+    {
+      "id": "particle-storm",
+      "name": "粒子风暴",
+      "description": "上升粒子 + 散景光斑",
+      "tags": ["华丽", "科幻"],
+      "params": {
+        "particleSpeed": 1.0,
+        "particleCount": 120,
+        "glowIntensity": 0.35,
+        "colors": ["#b44dff", "#8b2fc9", "#d580ff", "#6a1b9a", "#e040fb", "#7c4dff", "#aa00ff"]
+      }
+    },
+    {
+      "id": "cyber-glitch",
+      "name": "赛博故障",
+      "description": "RGB分裂 + 扫描线 + 随机闪烁",
+      "tags": ["赛博朋克", "FPS"],
+      "params": {
+        "glitchFrequency": 1.0,
+        "scanlineOpacity": 0.08,
+        "rgbOffset": 5,
+        "glowIntensity": 0.3
+      }
+    },
+    {
+      "id": "color-wave",
+      "name": "色彩波浪",
+      "description": "色相循环 + 光束扫过 + 散景",
+      "tags": ["梦幻", "氛围"],
+      "params": {
+        "hueCycleSpeed": 1.0,
+        "sweepSpeed": 1.0,
+        "bokehCount": 15,
+        "glowIntensity": 0.4
+      }
+    }
+  ]
+}
