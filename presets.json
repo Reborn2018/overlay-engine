@@ -47,6 +47,57 @@
         "bokehCount": 15,
         "glowIntensity": 0.4
       }
+    },
+    {
+      "id": "flying-sheep",
+      "name": "飞绵羊",
+      "description": "可爱小绵羊飘过，棉花糖质感",
+      "tags": ["可爱", "治愈"],
+      "params": {
+        "sheepCount": 5,
+        "sheepSpeed": 0.8,
+        "cloudOpacity": 0.15,
+        "warmGlow": 0.2,
+        "colors": ["#ffb3c6", "#ffd6e0", "#fff0f5", "#c9f0ff", "#e8d5ff"]
+      }
+    },
+    {
+      "id": "kawaii-sparkles",
+      "name": "梦幻星光",
+      "description": "星星+爱心+闪粉漂浮，童话感",
+      "tags": ["梦幻", "可爱"],
+      "params": {
+        "sparkleCount": 40,
+        "heartCount": 12,
+        "sparkleSpeed": 1.0,
+        "sparkleOpacity": 0.8,
+        "colors": ["#ff9eb5", "#ffb347", "#c9a0ff", "#87e8de", "#ffd700"]
+      }
+    },
+    {
+      "id": "firefly-night",
+      "name": "萤火虫之夜",
+      "description": "暖色萤火虫飘动，夜间氛围感",
+      "tags": ["夜晚", "氛围"],
+      "params": {
+        "fireflyCount": 60,
+        "fireflySpeed": 0.6,
+        "glowIntensity": 0.6,
+        "colors": ["#ffe066", "#ffcc00", "#fff3b0", "#ffc8dd", "#ffb3c6"]
+      }
+    },
+    {
+      "id": "bunny-parade",
+      "name": "兔子游行",
+      "description": "小兔子蹦蹦跳跳经过，可爱爆棚",
+      "tags": ["可爱", "游戏"],
+      "params": {
+        "bunnyCount": 4,
+        "jumpSpeed": 1.0,
+        "size": 1.0,
+        "color": "#fff0f5",
+        "glowOpacity": 0.2
+      }
     }
   ]
 }

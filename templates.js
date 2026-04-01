@@ -185,6 +185,410 @@ animate();
 ${baseTail()}`;
 }
 
+// ==================== 5. 飞绵羊 ====================
+function flyingSheep(imageUrl, opts = {}) {
+  const p = {
+    sheepCount: 5, sheepSpeed: 0.8, cloudOpacity: 0.15,
+    warmGlow: 0.2,
+    colors: ['#ffb3c6', '#ffd6e0', '#fff0f5', '#c9f0ff', '#e8d5ff'], ...opts
+  };
+  const colorsJson = JSON.stringify(p.colors);
+  const cloudOp = Math.min(p.cloudOpacity, 0.4).toFixed(2);
+  const glowOp = Math.min(p.warmGlow, 0.6).toFixed(2);
+  return `${baseHead()}
+<style>
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
+.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(8px) brightness(1.3);z-index:2;pointer-events:none;animation:wg 6s ease-in-out infinite}
+@keyframes wg{0%,100%{opacity:${glowOp}}50%{opacity:${(p.warmGlow*1.5).toFixed(2)}}}
+.cloud{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${cloudOp};filter:blur(20px) brightness(1.1);z-index:1;pointer-events:none}
+</style>
+<div class="warm"></div>
+<div class="cloud"></div>
+<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<canvas id="cv" width="1920" height="1080"></canvas>
+${watermarkHtml(opts.watermark)}
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=1920,H=1080;
+const colors=${colorsJson};
+const speed=${p.sheepSpeed};
+
+// 绘制棉花糖绵羊
+function drawSheep(x,y,sz,phase,col){
+  ctx.save();
+  ctx.translate(x,y);
+  // 身体（棉花糖效果）
+  const bodyX=0,bodyY=0;
+  for(let i=0;i<8;i++){
+    ctx.save();
+    ctx.globalAlpha=0.6+i*0.04;
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    ctx.arc(bodyX+Math.cos(i*0.8)*sz*0.4,bodyY+Math.sin(i*0.8)*sz*0.3,sz*(0.55+i*0.04),0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha=1;
+  ctx.fillStyle=col;
+  ctx.beginPath();ctx.arc(bodyX,bodyY,sz*0.6,0,Math.PI*2);ctx.fill();
+  // 头
+  ctx.fillStyle='#ffe8f0';
+  ctx.beginPath();ctx.arc(sz*0.5,-sz*0.2,sz*0.28,0,Math.PI*2);ctx.fill();
+  // 眼睛
+  ctx.fillStyle='#333';
+  ctx.beginPath();ctx.arc(sz*0.58,-sz*0.25,sz*0.06,0,Math.PI*2);ctx.fill();
+  // 腮红
+  ctx.fillStyle='rgba(255,150,180,0.4)';
+  ctx.beginPath();ctx.arc(sz*0.65,-sz*0.1,sz*0.1,0,Math.PI*2);ctx.fill();
+  // 耳朵
+  ctx.fillStyle='#ffd6e0';
+  ctx.beginPath();ctx.ellipse(sz*0.35,-sz*0.45,sz*0.12,sz*0.08,Math.PI*0.3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(sz*0.6,-sz*0.45,sz*0.12,sz*0.08,-Math.PI*0.3,0,Math.PI*2);ctx.fill();
+  // 腿
+  ctx.fillStyle='#ffe8f0';
+  const legY=sz*0.45;
+  [[-sz*0.25,-1],[sz*0.1,-1],[sz*0.25,1],[sz*0.45,1]].forEach(([lx,dir])=>{
+    ctx.beginPath();
+    ctx.ellipse(lx,legY+Math.sin(phase+dir)*sz*0.1,sz*0.08,sz*0.18,0,0,Math.PI*2);
+    ctx.fill();
+  });
+  // 小尾巴
+  ctx.fillStyle=col;
+  ctx.beginPath();ctx.arc(-sz*0.5,sz*0.1,sz*0.2,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+class Sheep{
+  constructor(){this.reset()}
+  reset(){
+    this.x=-120;this.y=100+Math.random()*(H-300);
+    this.sz=35+Math.random()*30;this.speed=(0.5+Math.random()*0.8)*${speed};
+    this.bounce=Math.random()*Math.PI*2;this.bounceSpd=0.03+Math.random()*0.02;
+    this.color=colors[Math.floor(Math.random()*colors.length)];
+    this.wobble=Math.random()*Math.PI*2;this.wobbleSpd=0.015;
+    this.trail=[];this.op=0.5+Math.random()*0.5;
+  }
+  update(){
+    this.x+=this.speed;this.bounce+=this.bounceSpd;this.wobble+=this.wobbleSpd;
+    this.trail.push({x:this.x-this.sz*0.3,y:this.y+this.sz*0.1,sz:this.sz*0.3,op:0.5});
+    if(this.trail.length>12)this.trail.shift();
+    this.trail.forEach(t=>t.op*=0.88);
+    if(this.x>W+150)this.reset();
+  }
+  draw(){
+    const sz=this.sz;
+    // 棉花云轨迹
+    this.trail.forEach(t=>{
+      ctx.save();
+      ctx.globalAlpha=t.op*0.4*this.op;
+      ctx.fillStyle=this.color;
+      ctx.beginPath();ctx.arc(t.x,t.y,t.sz,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    // 羊羊本体
+    drawSheep(this.x,this.y+Math.sin(this.bounce)*8,sz,this.bounce,this.color);
+  }
+}
+
+const sheep=[];
+for(let i=0;i<${Math.round(p.sheepCount)};i++){
+  const s=new Sheep();
+  s.x=-120-Math.random()*600;
+  sheep.push(s);
+}
+
+let t=0;
+function animate(){
+  t++;
+  ctx.clearRect(0,0,W,H);
+  sheep.forEach(s=>{s.update();s.draw()});
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+${baseTail()}`;
+}
+
+// ==================== 6. 梦幻星光 ====================
+function kawaiiSparkles(imageUrl, opts = {}) {
+  const p = {
+    sparkleCount: 40, heartCount: 12, sparkleSpeed: 1.0, sparkleOpacity: 0.8,
+    colors: ['#ff9eb5', '#ffb347', '#c9a0ff', '#87e8de', '#ffd700'], ...opts
+  };
+  const colorsJson = JSON.stringify(p.colors);
+  const op = Math.min(p.sparkleOpacity, 1).toFixed(2);
+  return `${baseHead()}
+<style>
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
+.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:0.15;filter:blur(12px) brightness(1.2);z-index:2;pointer-events:none}
+</style>
+<div class="soft"></div>
+<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<canvas id="cv" width="1920" height="1080"></canvas>
+${watermarkHtml(opts.watermark)}
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=1920,H=1080;
+const colors=${colorsJson};
+const spd=${p.sparkleSpeed};
+
+// 绘制爱心
+function heart(x,y,sz,col,alpha,rotation){
+  ctx.save();
+  ctx.translate(x,y);ctx.rotate(rotation);ctx.globalAlpha=alpha;
+  ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=sz*0.5;
+  ctx.beginPath();
+  ctx.moveTo(0,sz*0.3);
+  ctx.bezierCurveTo(-sz*0.5,-sz*0.1,-sz,-sz*0.6,0,-sz*0.9);
+  ctx.bezierCurveTo(sz,-sz*0.6,sz*0.5,-sz*0.1,0,sz*0.3);
+  ctx.fill();ctx.restore();
+}
+
+// 绘制星星
+function star(x,y,sz,col,alpha,rot,points){
+  ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.globalAlpha=alpha;
+  ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=sz*0.8;
+  ctx.beginPath();
+  for(let i=0;i<points*2;i++){
+    const r=i%2===0?sz:sz*0.4;
+    const a=(i*Math.PI/points)-Math.PI/2;
+    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+  }
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+
+// 绘制小闪粉
+function dot(x,y,sz,col,alpha){
+  ctx.save();ctx.translate(x,y);ctx.globalAlpha=alpha;
+  ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=sz*2;
+  ctx.fillRect(-sz/2,-sz/2,sz,sz);ctx.restore();
+}
+
+class Sparkle{
+  constructor(type){this.reset(type)}
+  reset(type){
+    this.type=type||['dot','star','heart'][Math.floor(Math.random()*3)];
+    this.x=Math.random()*W;this.y=H+20+Math.random()*100;
+    this.sz=Math.random()*12+4;this.vy=-(0.3+Math.random()*0.8)*spd;
+    this.vx=(Math.random()-0.5)*0.5*spd;this.t=Math.random()*Math.PI*2;
+    this.tSpd=0.02+Math.random()*0.03;this.c=colors[Math.floor(Math.random()*colors.length)];
+    this.op=0.4+Math.random()*0.6;this.rot=Math.random()*Math.PI*2;this.rotSpd=(Math.random()-0.5)*0.03;
+    this.life=1;this.decay=0.0008+Math.random()*0.001;
+  }
+  update(){
+    this.t+=this.tSpd;this.x+=this.vx+Math.sin(this.t)*0.3;this.y+=this.vy;
+    this.rot+=this.rotSpd;this.life-=this.decay;
+    if(this.life<=0||this.y<-50)this.reset();
+  }
+  draw(){
+    const alpha=this.op*this.life;
+    if(this.type==='dot')dot(this.x,this.y,this.sz,this.c,alpha*${op});
+    else if(this.type==='heart')heart(this.x,this.y,this.sz,this.c,alpha*${op},this.rot);
+    else star(this.x,this.y,this.sz,this.c,alpha*${op},this.rot,5);
+  }
+}
+
+const items=[];
+for(let i=0;i<${Math.round(p.sparkleCount)};i++)items.push(new Sparkle('dot'));
+for(let i=0;i<${Math.round(p.heartCount)};i++)items.push(new Sparkle('heart'));
+for(let i=0;i<${Math.round(p.sparkleCount/4)};i++)items.push(new Sparkle('star'));
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  items.forEach(s=>{s.update();s.draw()});
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+${baseTail()}`;
+}
+
+// ==================== 7. 萤火虫之夜 ====================
+function fireflyNight(imageUrl, opts = {}) {
+  const p = {
+    fireflyCount: 60, fireflySpeed: 0.6, glowIntensity: 0.6,
+    colors: ['#ffe066', '#ffcc00', '#fff3b0', '#ffc8dd', '#ffb3c6'], ...opts
+  };
+  const colorsJson = JSON.stringify(p.colors);
+  const glowOp = Math.min(p.glowIntensity, 1).toFixed(2);
+  return `${baseHead()}
+<style>
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
+.warm{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(15px) brightness(1.1);z-index:2;pointer-events:none;animation:ww 5s ease-in-out infinite}
+@keyframes ww{0%,100%{opacity:${glowOp}}50%{opacity:${(p.glowIntensity*1.4).toFixed(2)}}}
+</style>
+<div class="warm"></div>
+<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<canvas id="cv" width="1920" height="1080"></canvas>
+${watermarkHtml(opts.watermark)}
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=1920,H=1080;
+const colors=${colorsJson};
+const spd=${p.fireflySpeed};
+
+class F{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.sz=2+Math.random()*4;this.t=Math.random()*Math.PI*2;
+    this.tSpd=0.01+Math.random()*0.02;this.baseT=Math.random()*Math.PI*2;
+    this.vx=(Math.random()-0.5)*0.4*spd;this.vy=(Math.random()-0.5)*0.4*spd;
+    this.c=colors[Math.floor(Math.random()*colors.length)];
+    this.glow=(Math.random()*0.5+0.5)*${glowOp};
+  }
+  update(){
+    this.t+=this.tSpd;
+    this.x+=this.vx+Math.sin(this.t)*0.3*spd;
+    this.y+=this.vy+Math.cos(this.t*0.7)*0.2*spd;
+    if(this.x<-20)this.x=W+20;if(this.x>W+20)this.x=-20;
+    if(this.y<-20)this.y=H+20;if(this.y>H+20)this.y=-20;
+  }
+  draw(){
+    const pulse=0.5+0.5*Math.sin(this.t*3+this.baseT);
+    const alpha=this.glow*pulse;
+    // 外发光
+    ctx.save();
+    const grd=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.sz*8);
+    grd.addColorStop(0,'rgba(255,240,150,'+(alpha*0.4)+')');
+    grd.addColorStop(1,'rgba(255,240,150,0)');
+    ctx.fillStyle=grd;
+    ctx.beginPath();ctx.arc(this.x,this.y,this.sz*8,0,Math.PI*2);ctx.fill();
+    // 核心
+    ctx.globalAlpha=alpha*0.9;
+    ctx.fillStyle=this.c;ctx.shadowColor=this.c;ctx.shadowBlur=this.sz*6;
+    ctx.beginPath();ctx.arc(this.x,this.y,this.sz,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+}
+
+const ff=[];
+for(let i=0;i<${Math.round(p.fireflyCount)};i++)ff.push(new F());
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  ff.forEach(f=>{f.update();f.draw()});
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+${baseTail()}`;
+}
+
+// ==================== 8. 兔子游行 ====================
+function bunnyParade(imageUrl, opts = {}) {
+  const p = {
+    bunnyCount: 4, jumpSpeed: 1.0, size: 1.0,
+    color: '#fff0f5', glowOpacity: 0.2, ...opts
+  };
+  const glowOp = Math.min(p.glowOpacity, 0.6).toFixed(2);
+  const bunnyColor = p.color || '#fff0f5';
+  return `${baseHead()}
+<style>
+.base{width:1920px;height:1080px;object-fit:contain;display:block;position:relative;z-index:1}
+canvas{position:absolute;top:0;left:0;z-index:3;pointer-events:none}
+.soft{position:absolute;top:0;left:0;width:1920px;height:1080px;background:url('${imageUrl}') center/contain no-repeat;mix-blend-mode:screen;opacity:${glowOp};filter:blur(15px) brightness(1.2);z-index:2;pointer-events:none}
+</style>
+<div class="soft"></div>
+<img class="base" src="${imageUrl}" crossorigin="anonymous">
+<canvas id="cv" width="1920" height="1080"></canvas>
+${watermarkHtml(opts.watermark)}
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=1920,H=1080;
+const baseSpd=${p.jumpSpeed};
+const sz=${p.size};
+
+function drawBunny(x,y,bSz,phase,col,tint){
+  ctx.save();
+  ctx.translate(x,y);
+  const bounce=Math.abs(Math.sin(phase))*bSz;
+  const squash=0.9+Math.abs(Math.sin(phase))*0.15;
+  // 身体
+  ctx.save();ctx.scale(1/squash,squash);
+  ctx.fillStyle=col;ctx.shadowColor='rgba(255,180,200,0.5)';ctx.shadowBlur=bSz*0.3;
+  ctx.beginPath();ctx.ellipse(0,bounce+bSz*0.3,0,bSz*0.5,bSz*0.5,0,Math.PI*2);ctx.fill();ctx.restore();
+  // 头
+  ctx.fillStyle=col;
+  ctx.beginPath();ctx.arc(0,-bSz*0.4+bounce,0,bSz*0.35,bSz*0.35,0,Math.PI*2);ctx.fill();
+  // 长耳朵
+  const earT=Math.sin(phase*2)*0.15;
+  ctx.fillStyle=col;
+  ctx.beginPath();ctx.ellipse(-bSz*0.2,-bSz*1.0+bounce,0,bSz*0.1,bSz*0.28,earT-0.3,earT-0.3+Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(bSz*0.2,-bSz*1.0+bounce,0,bSz*0.1,bSz*0.28,-earT-0.3,-earT-0.3+Math.PI*2);ctx.fill();
+  // 耳廓（粉色）
+  ctx.fillStyle='#ffc8dd';
+  ctx.beginPath();ctx.ellipse(-bSz*0.2,-bSz*1.0+bounce,0,bSz*0.05,bSz*0.15,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(bSz*0.2,-bSz*1.0+bounce,0,bSz*0.05,bSz*0.15,0,Math.PI*2);ctx.fill();
+  // 眼睛
+  ctx.fillStyle='#333';
+  ctx.beginPath();ctx.arc(-bSz*0.12,-bSz*0.42+bounce,0,bSz*0.06,bSz*0.06,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(bSz*0.12,-bSz*0.42+bounce,0,bSz*0.06,bSz*0.06,0,Math.PI*2);ctx.fill();
+  // 高光
+  ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.beginPath();ctx.arc(-bSz*0.1,-bSz*0.44+bounce,0,bSz*0.025,bSz*0.025,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(bSz*0.14,-bSz*0.44+bounce,0,bSz*0.025,bSz*0.025,0,Math.PI*2);ctx.fill();
+  // 鼻子
+  ctx.fillStyle='#ff9eb5';
+  ctx.beginPath();ctx.arc(0,-bSz*0.3+bounce,0,bSz*0.05,bSz*0.05,0,Math.PI*2);ctx.fill();
+  // 腮红
+  ctx.fillStyle='rgba(255,150,180,0.3)';
+  ctx.beginPath();ctx.arc(-bSz*0.2,-bSz*0.3+bounce,0,bSz*0.08,bSz*0.08,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(bSz*0.2,-bSz*0.3+bounce,0,bSz*0.08,bSz*0.08,0,Math.PI*2);ctx.fill();
+  // 前脚（跳起时收起来）
+  ctx.fillStyle=col;
+  if(Math.sin(phase)<0.2){
+    ctx.beginPath();ctx.ellipse(-bSz*0.2,bSz*0.7+bounce*0.5,0,bSz*0.1,bSz*0.06,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(bSz*0.2,bSz*0.7+bounce*0.5,0,bSz*0.1,bSz*0.06,0,0,Math.PI*2);ctx.fill();
+  }
+  // 后脚
+  ctx.beginPath();ctx.ellipse(-bSz*0.35,bSz*0.5+bounce*0.3,0,bSz*0.15,bSz*0.08,Math.PI*0.3,Math.PI*0.3+Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(bSz*0.35,bSz*0.5+bounce*0.3,0,bSz*0.15,bSz*0.08,-Math.PI*0.3,-Math.PI*0.3+Math.PI*2);ctx.fill();
+  // 小尾巴
+  ctx.fillStyle=col;ctx.shadowColor='rgba(255,180,200,0.3)';ctx.shadowBlur=bSz*0.2;
+  ctx.beginPath();ctx.arc(0,bSz*0.7,0,bSz*0.18,bSz*0.18,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+class Bunny{
+  constructor(){
+    this.reset();
+  }
+  reset(){
+    this.x=-80-Math.random()*400;this.y=200+Math.random()*(H-400);
+    this.baseSpd=(0.8+Math.random()*0.8)*baseSpd;
+    this.sz=(30+Math.random()*20)*sz;this.phase=Math.random()*Math.PI*2;
+    this.phaseSpd=0.06+Math.random()*0.03;this.col='${bunnyColor}';
+  }
+  update(){
+    this.x+=this.baseSpd;this.phase+=this.phaseSpd;
+    if(this.x>W+100)this.reset();
+  }
+  draw(){
+    drawBunny(this.x,this.y,this.sz,this.phase,this.col);
+  }
+}
+
+const bunnies=[];
+for(let i=0;i<${Math.round(p.bunnyCount)};i++){
+  const b=new Bunny();
+  b.x+=i*200;
+  bunnies.push(b);
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  bunnies.forEach(b=>{b.update();b.draw()});
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+${baseTail()}`;
+}
+
 // 预设配置（供 server.js 读取）
 const presetConfigs = presets.presets || [];
 
@@ -194,6 +598,9 @@ module.exports = {
   'particle-storm': particleStorm,
   'cyber-glitch': cyberGlitch,
   'color-wave': colorWave,
-  // 预设元数据
+  'flying-sheep': flyingSheep,
+  'kawaii-sparkles': kawaiiSparkles,
+  'firefly-night': fireflyNight,
+  'bunny-parade': bunnyParade,
   getPresets: () => presetConfigs
 };

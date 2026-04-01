@@ -83,9 +83,13 @@ app.get('/overlay', (req, res) => {
   // 预设参数名映射（URL参数名 → 模板期望的参数名）
   const paramMap = {
     'neon-breathe':  {},
-    'particle-storm': { speed: 'particleSpeed', particleCount: 'particleCount', particleSpeed: 'particleSpeed', glowIntensity: 'glowIntensity', colors: 'colors' },
+    'particle-storm': { speed: 'particleSpeed', particleCount: 'particleCount', glowIntensity: 'glowIntensity', colors: 'colors' },
     'cyber-glitch':  { glitchFrequency: 'glitchFrequency', scanlineOpacity: 'scanlineOpacity', rgbOffset: 'rgbOffset', glowIntensity: 'glowIntensity' },
-    'color-wave':    { hueCycleSpeed: 'hueCycleSpeed', sweepSpeed: 'sweepSpeed', bokehCount: 'bokehCount', glowIntensity: 'glowIntensity' }
+    'color-wave':    { hueCycleSpeed: 'hueCycleSpeed', sweepSpeed: 'sweepSpeed', bokehCount: 'bokehCount', glowIntensity: 'glowIntensity' },
+    'flying-sheep':  { sheepCount: 'sheepCount', sheepSpeed: 'sheepSpeed', cloudOpacity: 'cloudOpacity', warmGlow: 'warmGlow', colors: 'colors' },
+    'kawaii-sparkles': { sparkleCount: 'sparkleCount', heartCount: 'heartCount', sparkleSpeed: 'sparkleSpeed', sparkleOpacity: 'sparkleOpacity', colors: 'colors' },
+    'firefly-night': { fireflyCount: 'fireflyCount', fireflySpeed: 'fireflySpeed', glowIntensity: 'glowIntensity', colors: 'colors' },
+    'bunny-parade':  { bunnyCount: 'bunnyCount', jumpSpeed: 'jumpSpeed', size: 'size', color: 'color', glowOpacity: 'glowOpacity' }
   };
 
   // 转换参数名
